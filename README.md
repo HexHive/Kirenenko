@@ -60,3 +60,32 @@ the newly generated test case(s).
 Currently I've tested with `bitflip`, `call_fn`, `call_fn2`, `call_fn3`,
 `cf1`, `context`, `gep`, `gep2`, `if_eq`, `infer_type`, `memcmp`, `mini`,
 `pointer`, `shift_and`, `sign`, `strcmp`, `strcmp2`, `switch` and `switch2`.
+
+## Usage
+
+### Instrument target
+I have provided the instrument script under /path-to-Kirenenko/script, users need to modify the
+source code path in the script to make it work on your machine
+
+```shell
+cd /path-to-Kirenenko/script
+./instrument.sh
+```
+
+### Collect constraints 
+The code is not gorgeous now, I modify the original code of Kirenenko to 1) print branch condition
+to the scree  2) disable branch flipping (Kirenenko will flip the condition and generate the 
+corresponding new input by default)  3) disable the input generation
+
+I use the *libtiff* as an example, the execute parameter of tiff2pdf is:
+```shell
+./tiff2pdf /your_poc_path -o tmp.out
+```
+
+The symbolic constraints collection command is:
+```shell
+TAINT_OPTIONS="taint_file=/absolute_path_to_poc" /path_to_tiff2pdf /path_to_poc -o tmp.out > /tmp/flush.data
+```
+The branch condition will be dumped in to the *flush.data*
+
+

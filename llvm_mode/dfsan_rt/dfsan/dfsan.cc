@@ -860,6 +860,7 @@ static void __solve_cond(dfsan_label label, z3::expr &result, bool add_nested, v
 
     printf("%s\n", cond.to_string().c_str());
     __z3_solver.reset();
+    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
     /*
         //AOUT("%s\n", cond.to_string().c_str());
     __z3_solver.add(cond != result);
