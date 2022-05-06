@@ -858,7 +858,9 @@ static void __solve_cond(dfsan_label label, z3::expr &result, bool add_nested, v
       }
     }
 
+    printf("%s\n", cond.to_string().c_str());
     __z3_solver.reset();
+    /*
         //AOUT("%s\n", cond.to_string().c_str());
     __z3_solver.add(cond != result);
     z3::check_result res = __z3_solver.check();
@@ -915,7 +917,7 @@ static void __solve_cond(dfsan_label label, z3::expr &result, bool add_nested, v
         }
       }
     }
-
+    */
     // mark as flipped
     get_label_info(label)->flags |= B_FLIPPED;
   } catch (z3::exception e) {
