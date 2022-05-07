@@ -114,9 +114,12 @@ static void add_runtime() {
   } else {
     cc_params[cc_par_cnt++] = "-lc++";
     cc_params[cc_par_cnt++] = "-lc++abi";
-    // cc_params[cc_par_cnt++] = "-lstdc++";
+    cc_params[cc_par_cnt++] = "-lstdc++";
   }
   cc_params[cc_par_cnt++] = "-lrt";
+
+  cc_params[cc_par_cnt++] = "-L" Z3_LIB_DIR;
+  cc_params[cc_par_cnt++] = "-Wl,-rpath=" Z3_LIB_DIR;
 
   cc_params[cc_par_cnt++] = "-Wl,--no-as-needed";
   cc_params[cc_par_cnt++] = "-Wl,--gc-sections"; // if darwin -Wl, -dead_strip

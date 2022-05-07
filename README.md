@@ -12,7 +12,7 @@ I don't have much time to code so progress will slowdown.
 ### Build Requirements
 
 - Linux-amd64 (Tested on Ubuntu 18.04)
-- [LLVM 4.0.0 - 7.1.0](http://llvm.org/docs/index.html) :
+- [LLVM 4.0.0 - 12.0.0](http://llvm.org/docs/index.html) :
   run `sudo apt install clang` or
   `PREFIX=/path-to-install ./build/install_llvm.sh`.
 

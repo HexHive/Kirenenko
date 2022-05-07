@@ -17,10 +17,11 @@ PREFIX=${PREFIX:-${ROOT_DIR}/bin/}
 # install Z3
 pushd z3
 rm -rf build
-python scripts/mk_make.py
+mkdir build
 pushd build
+cmake .. -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
-sudo make install
+make install
 popd
 popd
 
@@ -33,9 +34,12 @@ pushd llvm_mode
 rm -rf build
 mkdir -p build
 pushd build
-CC=clang CXX=clang++ cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ..
+CC=clang CXX=clang++ cmake .. \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DZ3_DIR="$(pwd)/../../z3/build/install/lib/cmake/z3"
 make -j$(nproc)
-sudo make install
+make install
 popd
 popd
 

@@ -25,7 +25,6 @@ set(CAN_TARGET_${X86_64} 1)
 set(DFSAN_SUPPORTED_ARCH ${X86_64}) #  ${MIPS64} ${ARM64}
 set(SANITIZER_COMMON_SUPPORTED_ARCH ${X86_64}) #  ${MIPS64} ${ARM64}
 
-list(APPEND SANITIZER_COMMON_CFLAGS "-stdlib=libc++")
 list(APPEND SANITIZER_COMMON_CFLAGS -O3)
 list(APPEND SANITIZER_COMMON_CFLAGS -fPIC)
 
@@ -51,7 +50,7 @@ set_property(
 include(AddCompilerRT)
 include(SanitizerUtils)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(sanitizer_common)
 add_subdirectory(interception)
