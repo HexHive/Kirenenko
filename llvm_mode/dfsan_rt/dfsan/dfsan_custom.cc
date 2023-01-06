@@ -1252,6 +1252,49 @@ int __dfsw_snprintf(char *str, size_t size, const char *format,
   return ret;
 }
 
+SANITIZER_INTERFACE_ATTRIBUTE
+int __dfsw_vsprintf(char *str, const char *format, dfsan_label str_label,
+                    dfsan_label format_label, dfsan_label *va_labels,
+                    dfsan_label *ret_label, va_list ap) {
+    int ret = format_buffer(str, ~0ul, format, va_labels, ret_label, nullptr,
+                            nullptr, ap);
+    return ret;
+}
+
+SANITIZER_INTERFACE_ATTRIBUTE
+int __dfso_vsprintf(char *str, const char *format, dfsan_label str_label,
+                    dfsan_label format_label, dfsan_label *va_labels,
+                    dfsan_label *ret_label, dfsan_origin str_origin,
+                    dfsan_origin format_origin, dfsan_origin *va_origins,
+                    dfsan_origin *ret_origin, va_list ap) {
+    int ret = format_buffer(str, ~0ul, format, va_labels, ret_label, va_origins,
+                            ret_origin, ap);
+    return ret;
+}
+
+SANITIZER_INTERFACE_ATTRIBUTE
+int __dfsw_vsnprintf(char *str, size_t size, const char *format,
+                     dfsan_label str_label, dfsan_label size_label,
+                     dfsan_label format_label, dfsan_label *va_labels,
+                     dfsan_label *ret_label, va_list ap) {
+    int ret = format_buffer(str, size, format, va_labels, ret_label, nullptr,
+                            nullptr, ap);
+    return ret;
+}
+
+SANITIZER_INTERFACE_ATTRIBUTE
+int __dfso_vsnprintf(char *str, size_t size, const char *format,
+                     dfsan_label str_label, dfsan_label size_label,
+                     dfsan_label format_label, dfsan_label *va_labels,
+                     dfsan_label *ret_label, dfsan_origin str_origin,
+                     dfsan_origin size_origin, dfsan_origin format_origin,
+                     dfsan_origin *va_origins, dfsan_origin *ret_origin,
+                     va_list ap) {
+    int ret = format_buffer(str, size, format, va_labels, ret_label, va_origins,
+                            ret_origin, ap);
+    return ret;
+}
+
 // Default empty implementations (weak). Users should redefine them.
 SANITIZER_INTERFACE_WEAK_DEF(void, __sanitizer_cov_trace_pc_guard, u32 *) {}
 SANITIZER_INTERFACE_WEAK_DEF(void, __sanitizer_cov_trace_pc_guard_init, u32 *,
