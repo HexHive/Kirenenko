@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 
 project(kirenenko_llvm_mode VERSION 1.2.2 LANGUAGES C CXX ASM)
 
-find_package(LLVM 6 REQUIRED CONFIG)
+find_package(LLVM REQUIRED CONFIG)
 
 if (LLVM_FOUND)
     message(STATUS "LLVM_VERSION_MAJOR: ${LLVM_VERSION_MAJOR}")
@@ -10,6 +10,16 @@ if (LLVM_FOUND)
     message(STATUS "LLVM_VERSION_PATCH: ${LLVM_VERSION_PATCH}")
 else()
     message(FATAL_ERROR "You haven't install LLVM !")
+endif()
+
+find_package(Z3 REQUIRED)
+
+if (Z3_FOUND)
+    message(STATUS "Z3_VERSION_MAJOR: ${Z3_VERSION_MAJOR}")
+    message(STATUS "Z3_VERSION_MINOR: ${Z3_VERSION_MINOR}")
+    message(STATUS "Z3_VERSION_PATCH: ${Z3_VERSION_PATCH}")
+else()
+    message(FATAL_ERROR "You haven't install Z3 !")
 endif()
 
 if (NOT TARGET LLVMPassConfig)
@@ -23,7 +33,7 @@ if (NOT TARGET LLVMPassConfig)
     )
 endif()
 
-include_directories(${LLVM_INCLUDE_DIRS})
+include_directories(${LLVM_INCLUDE_DIRS} ${Z3_CXX_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 include_directories(include)
