@@ -858,10 +858,14 @@ static void __solve_cond(dfsan_label label, z3::expr &result, bool add_nested, v
       }
     }
 
-    printf("%s\n", cond.to_string().c_str());
+#ifndef CONSTRAINTS_DUMP_MODE_TURN_OFF
+    DmpExt("%s\n", cond.to_string().c_str());
     __z3_solver.reset();
-    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-    /*
+    #ifdef CONSTRAINTS_DUMP_MODE_DEBUG
+    DmpExt("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    #endif
+#else
+    __z3_solver.reset();
         //AOUT("%s\n", cond.to_string().c_str());
     __z3_solver.add(cond != result);
     z3::check_result res = __z3_solver.check();
@@ -918,7 +922,7 @@ static void __solve_cond(dfsan_label label, z3::expr &result, bool add_nested, v
         }
       }
     }
-    */
+#endif
     // mark as flipped
     get_label_info(label)->flags |= B_FLIPPED;
   } catch (z3::exception e) {
@@ -1289,6 +1293,8 @@ static void dfsan_fini() {
 
 static void dfsan_init(int argc, char **argv, char **envp) {
   InitializeFlags();
+  __sanitizer_set_report_path(common_flags()->log_path);
+  __sanitizer_set_extfile_path(flags().dmp_constraints);
 
   InitializePlatformEarly();
   MmapFixedNoReserve(ShadowAddr(), UnusedAddr() - ShadowAddr());

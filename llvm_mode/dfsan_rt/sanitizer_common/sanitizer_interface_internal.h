@@ -29,6 +29,18 @@ extern "C" {
   // (casted to void *).
   SANITIZER_INTERFACE_ATTRIBUTE
   void __sanitizer_set_report_fd(void *fd);
+  // Tell the tools to write something extra they need to "path.<pid>". 
+  // The path must be explicitly specified correctly, or the preset 
+  // `kStderrFd` in `__sanitizer::extra_file` will cause a chain reaction
+  // you may not want to see: 
+  // At first not calling `__sanitizer_set_extfile_path` means not calling
+  // `__sanitizer::extra_file::SetReportPath`, so `__sanitizer::extra_file::fd`
+  // remains `kStderrFd`.
+  // Then in this case, once `__sanitizer::extra_file::Write` is called, 
+  // new file may still be created by `__sanitizer::extra_file::ReopenIfNecessary`.
+  // So be careful!
+  SANITIZER_INTERFACE_ATTRIBUTE
+  void __sanitizer_set_extfile_path(const char *path);
 
   typedef struct {
       int coverage_sandboxed;
