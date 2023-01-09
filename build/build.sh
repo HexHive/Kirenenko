@@ -33,7 +33,24 @@ pushd llvm_mode
 rm -rf build
 mkdir -p build
 pushd build
-CC=clang CXX=clang++ cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ..
+
+export CC=clang
+export CXX=clang++
+
+if   [ "${BUILD_TYPE}" = "0" ]; then
+    ### Build Normal ###
+    cmake -DDmpConstraints_state=OFF -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ..
+elif [ "${BUILD_TYPE}" = "1" ]; then
+    ### Build for dumping constraints ###
+    cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ..
+elif [ "${BUILD_TYPE}" = "2" ]; then
+    ### Build for dumping constraints(with line split for debug) ###
+    cmake -DDmpConstraints_debug=ON -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ..
+else
+    echo "Bad BUILD_TYPE"
+    exit
+fi
+
 make -j$(nproc)
 sudo make install
 popd

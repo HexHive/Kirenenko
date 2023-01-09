@@ -36,7 +36,7 @@ struct ReportFile {
   // Opened file descriptor. Defaults to stderr. It may be equal to
   // kInvalidFd, in which case new file will be opened when necessary.
   fd_t fd;
-  // Path prefix of report file, set via __sanitizer_set_report_path.
+  // Path prefix of report file, set via __sanitizer_set_*_path.
   char path_prefix[kMaxPathLength];
   // Full path to report, obtained as <path_prefix>.PID
   char full_path[kMaxPathLength];
@@ -48,6 +48,7 @@ struct ReportFile {
   void ReopenIfNecessary();
 };
 extern ReportFile report_file;
+extern ReportFile extra_file;
 
 enum FileAccessMode {
   RdOnly,

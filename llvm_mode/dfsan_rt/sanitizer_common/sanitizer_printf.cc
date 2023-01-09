@@ -243,7 +243,8 @@ static void CallPrintfAndReportCallback(const char *str) {
     PrintfAndReportCallback(str);
 }
 
-static void NOINLINE SharedPrintfCodeNoBuffer(bool append_pid,
+static void NOINLINE SharedPrintfCodeNoBuffer(bool is_extra, 
+                                              bool append_pid,
                                               char *local_buffer,
                                               int buffer_size,
                                               const char *format,
@@ -291,12 +292,16 @@ static void NOINLINE SharedPrintfCodeNoBuffer(bool append_pid,
     break;
 #   undef CHECK_NEEDED_LENGTH
   }
+  if (is_extra) { ExtWrite(buffer); }
+  else 
+  {
   RawWrite(buffer);
 
   // Remove color sequences from the message.
   RemoveANSIEscapeSequencesFromString(buffer);
   CallPrintfAndReportCallback(buffer);
   LogMessageOnPrintf(buffer);
+  }
 
   // If we had mapped any memory, clean up.
   if (buffer != local_buffer)
@@ -304,22 +309,22 @@ static void NOINLINE SharedPrintfCodeNoBuffer(bool append_pid,
   va_end(args2);
 }
 
-static void NOINLINE SharedPrintfCode(bool append_pid, const char *format,
-                                      va_list args) {
+static void NOINLINE SharedPrintfCode(bool is_extra, bool append_pid, 
+                             const char *format,    va_list args) {
   // |local_buffer| is small enough not to overflow the stack and/or violate
   // the stack limit enforced by TSan (-Wframe-larger-than=512). On the other
   // hand, the bigger the buffer is, the more the chance the error report will
   // fit into it.
   char local_buffer[400];
-  SharedPrintfCodeNoBuffer(append_pid, local_buffer, ARRAY_SIZE(local_buffer),
-                           format, args);
+  SharedPrintfCodeNoBuffer(is_extra, append_pid, 
+                        local_buffer, ARRAY_SIZE(local_buffer), format, args);
 }
 
 FORMAT(1, 2)
 void Printf(const char *format, ...) {
   va_list args;
   va_start(args, format);
-  SharedPrintfCode(false, format, args);
+  SharedPrintfCode(false, false, format, args);
   va_end(args);
 }
 
@@ -328,7 +333,20 @@ FORMAT(1, 2)
 void Report(const char *format, ...) {
   va_list args;
   va_start(args, format);
-  SharedPrintfCode(true, format, args);
+  SharedPrintfCode(false, true, format, args);
+  va_end(args);
+}
+
+// Write something extra you need to somewhere different
+// from where `__sanitizer::Report` and `__sanitizer::Printf`
+// write their strings to. Current PID will not be printed.
+// So unless the destination is a true file, you can't tell 
+// which PID the output string belongs to in stderr or stdout.
+FORMAT(1, 2)
+void DmpExt(const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  SharedPrintfCode(true, false, format, args);
   va_end(args);
 }
 

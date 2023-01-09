@@ -1,5 +1,21 @@
 # include_directories(..)
 
+# Features about constraints dumping
+option(DmpConstraints_state 
+  "Compiled llvm_mode for constraints dumping with branch flipping and input generation both disabled"
+  ON )
+option(DmpConstraints_debug 
+  "Write several '+' immediately as line split after each constraints print"
+  OFF)
+
+if (NOT DmpConstraints_state)
+	add_definitions(-DCONSTRAINTS_DUMP_MODE_TURN_OFF)
+else()
+  if (DmpConstraints_debug)
+    add_definitions(-DCONSTRAINTS_DUMP_MODE_DEBUG)
+  endif()
+endif()
+
 # Runtime library sources and build flags.
 set(DFSAN_RTL_SOURCES
   dfsan.cc
