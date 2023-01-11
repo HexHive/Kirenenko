@@ -34,6 +34,13 @@ void RawWrite(const char *buffer) {
   report_file.Write(buffer, internal_strlen(buffer));
 }
 
+StaticSpinMutex extra_file_mu;
+ReportFile extra_file = {&extra_file_mu, kInvalidFd, "", "", 0};
+
+void ExtWrite(const char *buffer) {
+  extra_file.Write(buffer, internal_strlen(buffer));
+}
+
 void ReportFile::ReopenIfNecessary() {
   mu->CheckLocked();
   if (fd == kStdoutFd || fd == kStderrFd) return;
@@ -210,6 +217,10 @@ void __sanitizer_set_report_path(const char *path) {
 void __sanitizer_set_report_fd(void *fd) {
   report_file.fd = (fd_t)reinterpret_cast<uptr>(fd);
   report_file.fd_pid = internal_getpid();
+}
+
+void __sanitizer_set_extfile_path(const char *path) {
+  extra_file.SetReportPath(path);
 }
 } // extern "C"
 

@@ -509,6 +509,14 @@ void __sanitizer_set_report_path(const char *path) {
 void __sanitizer_set_report_fd(void *fd) {
   UNREACHABLE("not available on Fuchsia");
 }
+
+void __sanitizer_set_extfile_path(const char *path) {
+  // FIXME: 
+  // The feature of writing extra things to file maybe still
+  // available when path is stderr just like log_path.
+  // Am I right?
+  UNREACHABLE("__sanitizer_set_extfile_path is not available on Fuchsia");
+}
 }  // extern "C"
 
 #endif  // SANITIZER_FUCHSIA

@@ -172,10 +172,12 @@ void SetLowLevelAllocateCallback(LowLevelAllocateCallback callback);
 // IO
 void CatastrophicErrorWrite(const char *buffer, uptr length);
 void RawWrite(const char *buffer);
+void ExtWrite(const char *buffer);
 bool ColorizeReports();
 void RemoveANSIEscapeSequencesFromString(char *buffer);
 void Printf(const char *format, ...);
 void Report(const char *format, ...);
+void DmpExt(const char *format, ...);
 void SetPrintfAndReportCallback(void (*callback)(const char *));
 #define VReport(level, ...)                                              \
   do {                                                                   \
