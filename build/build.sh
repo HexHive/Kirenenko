@@ -1,16 +1,15 @@
 #!/bin/bash
-BIN_PATH=$(readlink -f "$0")
-ROOT_DIR=$(dirname $(dirname $BIN_PATH))
 
 set -euxo pipefail
 
-git submodule init
-git submodule update
+BIN_PATH=$(readlink -f "$0")
+ROOT_DIR=$(dirname $(dirname $BIN_PATH))
 
-sudo apt-get update
-sudo apt-get install -y libc6 libstdc++6 linux-libc-dev gcc-multilib \
-    cmake clang llvm-dev g++ g++-multilib python python-pip zlib1g-dev \
-    libc++-dev libc++abi-dev
+USE_SUDO="sudo"
+
+if [ `id -u` == 0 ]; then
+    USE_SUDO=""
+fi
 
 PREFIX=${PREFIX:-${ROOT_DIR}/bin/}
 
@@ -20,7 +19,7 @@ rm -rf build
 python scripts/mk_make.py
 pushd build
 make -j$(nproc)
-sudo make install
+${USE_SUDO} make install
 popd
 popd
 
@@ -52,7 +51,7 @@ else
 fi
 
 make -j$(nproc)
-sudo make install
+${USE_SUDO} make install
 popd
 popd
 

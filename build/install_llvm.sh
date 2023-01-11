@@ -2,7 +2,7 @@
 set -eux
 
 LINUX_VER=${LINUX_VER:-ubuntu-16.04}
-LLVM_VER=${LLVM_VER:-7.0.0}
+LLVM_VER=${LLVM_VER:-6.0.0}
 PREFIX=${PREFIX:-${HOME}}
 
 LLVM_DEP_URL=https://releases.llvm.org/${LLVM_VER}

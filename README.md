@@ -8,26 +8,97 @@ For those who only need the original features, see [ChengyuSong/Kirenenko](https
 
 If the Constraints Dumping feature brought by this repository is just what you are looking for, please read on.
 
-## Building
+## Preparations
 
-### Build Requirements
+Before the tutorial starts, let's do some preparations to deploy Kirenenko in your environment.
 
-- Linux-amd64 (Tested on Ubuntu 18.04)
-- [LLVM 4.0.0 - 7.1.0](http://llvm.org/docs/index.html) :
-  run `sudo apt install clang` or
-  `PREFIX=/path-to-install ./build/install_llvm.sh`.
+:warning: It is strongly recommended that using *Ubuntu 18.04 on amd64 architecture* to deploy it. Otherwise you may encounter strange problems in certain situations. Welcome to [create an issue](https://github.com/SonicStark/Kirenenko/issues/new/choose) if you need some help.
 
-### Environment Variables
+### Step 1: Get source code of *Kirenenko*
 
-If installed from source,
-append the following entries in the shell configuration file (`~/.bashrc`, `~/.zshrc`).
+Currently it is recommended that get the source code as a git repository:
 
+```shell
+git clone https://github.com/SonicStark/Kirenenko.git
 ```
+
+Kirenenko depends on [z3](https://github.com/Z3Prover/z3.git) and [libdft64](https://github.com/AngoraFuzzer/libdft64.git). After cloning the repo, get those sub-modules prepared:
+
+```shell
+git submodule init
+git submodule update
+```
+
+### Step 2: Prepare proper version of clang
+
+:warning: For various reasons, today's Kirenenko can **ONLY** work with **clang from LLVM 6.0.0**.
+
+Here are two options. You **MUST** choose and **ONLY** choose one of them. However using `apt` should be your first choice because this can avoid potential compilation failure and is more friendly to normal users.
+
+---
+
+:star: **Option A: Use `apt`**
+
+For **Ubuntu 18.04**:
+
+```shell
+sudo apt-get install clang
+```
+
+For other Linux distributions, things become a little complicated. For example, in **Ubuntu 16.04** you firstly need
+
+```shell
+sudo apt-get install clang-6.0
+```
+
+But this is not enough. It allows you call `clang-6.0` or `clang++-6.0` in your shell, but not `clang` and `clang++` which are exactly what we need. (Admittedly, this is strange:confused:, but it is!) So in the next you should run
+
+```shell
+ln -s /usr/bin/clang-6.0 /usr/bin/clang
+ln -s /usr/bin/clang++-6.0 /usr/bin/clang++
+```
+
+to make exactly `clang` and `clang++` callable in your shell.
+
+---
+
+:star: **Option B:  Get from `releases.llvm.org`**
+
+You can find various versions of **LLVM** at [LLVM Download Page](https://releases.llvm.org/), and clang is released as part of regular LLVM releases. What we need can be found at https://releases.llvm.org/download.html#6.0.0. Usually for Ubuntu 16.04 or later [this one](https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz) is what you need.
+
+After downloading and extracting the archive, you should make the libraries searchable, and the binaries including `clang` as well as `clang++` callable in your shell. Usually you can do this by setting `PATH` and `LD_LIBRARY_PATH` in your shell.
+
+An example of the process mentioned above can be found at `./build/install_llvm.sh`. You can use `PREFIX=/path-to-install ./build/install_llvm.sh` and then append the following entries in the shell configuration file (~/.bashrc, or ~/.zshrc, or others). After appending, restart your shell and run `ldconfig`.
+
+```shell
 export PATH=/path-to-clang/bin:$PATH
 export LD_LIBRARY_PATH=/path-to-clang/lib:$LD_LIBRARY_PATH
 ```
 
-### Compilation
+---
+
+To ensure the needed clang is ready, follow these steps:
+
+:one:    Run `clang --version` and `clang++ --version` in your shell. `clang version 6.0.0` is expected in the output of both.
+
+:two:    Run `clang -print-search-dirs` in your shell. `llvm-6.0/lib` is expected in the output.
+
+:three:  Run `ldconfig -p` in your shell. `libclang-6.0.so` and `libLLVM-6.0.so` is expected in the output.
+
+
+### Step 3: Install dependency
+
+```shell
+sudo apt-get install          \
+  build-essential  cmake      \
+  gcc-multilib  g++-multilib  \
+  zlib1g-dev                  \
+  libstdc++6  linux-libc-dev  \
+  libc++-dev  libc++abi-dev   \
+  python  python-pip
+```
+
+### Step 4: Compile source code
 
 The build script will resolve most dependencies and setup the 
 runtime environment.
@@ -61,31 +132,7 @@ BUILD_TYPE=2 ./build/build.sh
 
 Then each line consisting of 50 '+' in the dump file will indicate the split point.
 
-### System Configuration
 
-As with AFL, system core dumps must be disabled.
-
-```shell
-echo core | sudo tee /proc/sys/kernel/core_pattern
-```
-
-## Test
-Running test from Angora
-```
-cd /path-to-angora/tests/mini
-../../bin/ko-clang mini.c -o mini.taint
-python -c "print('A'*20)" > i
-TAINT_OPTIONS="taint_file=i" ./mini.taint i
-./mini.taint id-0-0-0
-```
-
-It doesn't support input growth yet so we need to use a large enough
-seed input. It also lacks a driver yet, so we need to manually run
-the newly generated test case(s).
-
-Currently I've tested with `bitflip`, `call_fn`, `call_fn2`, `call_fn3`,
-`cf1`, `context`, `gep`, `gep2`, `if_eq`, `infer_type`, `memcmp`, `mini`,
-`pointer`, `shift_and`, `sign`, `strcmp`, `strcmp2`, `switch` and `switch2`.
 
 ## Tutorial: Use Constraints Dumping Feature to Collect Constraints
 
